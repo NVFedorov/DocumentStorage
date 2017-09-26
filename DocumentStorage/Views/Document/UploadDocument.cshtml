@@ -1,0 +1,78 @@
+﻿@using System.Web.Optimization
+@model DocumentStorage.Models.Document.DocumentViewModel
+@{
+    ViewBag.Title = "UploadDocument";
+    Layout = "~/Views/Shared/Layout.cshtml";
+}
+
+@Scripts.Render("~/bundles/fileinput")
+
+<h2>Upload Document</h2>
+
+<div class="row">
+    <div class="col-md-8">
+        <section id="fileUpload">
+            @using (Html.BeginForm("UploadDocument", "Document", new { ReturnUrl = ViewBag.ReturnUrl }, FormMethod.Post, new { @class = "form-horizontal", role = "form", enctype = "multipart/form-data" }))
+            {
+                @Html.AntiForgeryToken()
+                <hr />
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="form-group">
+                    @Html.LabelFor(m => m.File, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.File, new { type = "file" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Name, new { @class = "col-md-2 control-label" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor(m => m.Name, new { @class = "form-control", id = "nameInput", style = "min-width: 100%;" })
+                        @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                if (TempData["UploadStatus"] != null && (string)TempData["UploadStatus"] == "success")
+                {
+                    <div class="form-group" id="status-label">
+                        <div class="col-md-offset-2 col-md-10">
+                            <span class="label label-success">Successfully uploaded</span>
+                        </div>
+                    </div>
+                }
+
+                <div class="form-group" id="error-status-label" style="display: none;">
+                    <div class="col-md-offset-2 col-md-10">
+                        <span class="label label-danger" id="upload-error-label"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-offset-2 col-md-10">
+                        <input type="submit" value="Upload" class="btn btn-default" />
+                    </div>
+                </div>
+            }
+        </section>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(function () {
+        $("input[type=file]").bootstrapFileInput();
+        $("input[type=file]").change(function () {
+            $('#status-label').css('display', 'none');
+            $("#error-status-label").css('display', 'none');
+            var fileName = $(this).val().replace(/C:\\fakepath\\/i, '');
+            $("#nameInput").val(fileName.split('.')[0]);
+        });
+        $("form").submit(function () {
+            var maxSize = '@ViewBag.MaxFileSize';
+            if ($("input[type=file]")[0].files[0].size > maxSize) {
+                $("#error-status-label").css('display', '');
+                $("#error-status-label").find('span').text('The maximum file size allowed: ' + (maxSize / 1024 / 1024) + ' MB');
+                return false;
+            }
+
+            return true;
+        });
+    });
+</script>

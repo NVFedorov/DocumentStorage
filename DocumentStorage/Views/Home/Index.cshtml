@@ -1,0 +1,17 @@
+﻿@{
+    ViewBag.Title = "Document Storage";
+    Layout = "~/Views/Shared/Layout.cshtml";
+}
+
+<div style="text-align: center; margin-top: 30%;">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h1>Hi, @User.Identity.Name</h1>
+        <h2>Welcome to your Document Storage!</h2>
+    }
+    else
+    {
+        <h2>Welcome to The Document Storage!</h2>
+        <h3>Please log in to manage your documents.</h3>
+    }
+</div>

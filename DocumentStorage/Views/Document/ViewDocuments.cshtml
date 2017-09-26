@@ -1,0 +1,43 @@
+﻿@{
+    ViewBag.Title = "View Documents";
+    Layout = "~/Views/Shared/Layout.cshtml";
+}
+
+@using DocumentStorage.Models.Document
+@model List<DocumentStorage.Models.Document.DocumentViewModel>
+
+<h2>View Documents</h2>
+<hr />
+<div class="row">
+    @Html.Partial("SearchPartial", new SearchViewModel())
+</div>
+<p></p>
+<div class="row">
+    <table class="table table-hover" id="resultTable">
+        <thead>
+            <tr>
+                <th class="col-md-5">Name</th>
+                <th class="col-md-3">Author</th>
+                <th class="col-md-3">Creation Date</th>
+                <th class="col-md-1"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (var i = 0; i < Model.Count; i++)
+            {
+                using (Html.BeginForm("DownloadDocument", "Document", FormMethod.Post, new { role = "form" }))
+                {
+                    <tr>
+                        <td>@Html.DisplayFor(m => Model[i].DisplayName)</td>
+                        <td>@Html.DisplayFor(m => Model[i].Author)</td>
+                        <td>@Html.DisplayFor(m => Model[i].CreationDate)</td>
+                        @Html.HiddenFor(m => Model[i].Name)
+                        @Html.HiddenFor(m => Model[i].Author)
+                        @Html.Hidden("Index", i)
+                        <td><input type="image" src="~/Content/img/glyphicons-182-download-alt.png" border="0" alt="Download" /></td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,13 @@
+﻿@model DocumentStorage.Models.Document.SearchViewModel
+@using (Html.BeginForm("SearchDocuments", "Document", FormMethod.Post, new { role = "form" }))
+{
+    <h4>Search for documents:</h4>
+    <div class="form-group">
+        <div class="col-md-3">
+            @Html.TextBoxFor(m => m.SearchString, new { @class = "form-control"})
+        </div>
+        <div class="col-md-2">
+            <input type="image" src="~/Content/img/glyphicons-28-search.png" class="btn btn-default" />
+        </div>
+    </div>
+}
