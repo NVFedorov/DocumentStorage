@@ -12,32 +12,67 @@
     @Html.Partial("SearchPartial", new SearchViewModel())
 </div>
 <p></p>
-<div class="row">
-    <table class="table table-hover" id="resultTable">
-        <thead>
-            <tr>
-                <th class="col-md-5">Name</th>
-                <th class="col-md-3">Author</th>
-                <th class="col-md-3">Creation Date</th>
-                <th class="col-md-1"></th>
-            </tr>
-        </thead>
-        <tbody>
-            @for (var i = 0; i < Model.Count; i++)
-            {
-                using (Html.BeginForm("DownloadDocument", "Document", FormMethod.Post, new { role = "form" }))
+@using (Html.BeginForm("ViewDocuments", "Document", FormMethod.Post, new { id = "view-docs-form" }))
+{
+    @Html.Hidden("order", "asc", new { id = "order-inp" })
+    @Html.Hidden("columnName", string.Empty, new { id = "column-name-inp" })
+    <div class="row">
+        <table class="table table-hover" id="resultTable">
+            <thead>
+                <tr>
+                    <th class="col-md-5 sortable">Name</th>
+                    <th class="col-md-3 sortable">Author</th>
+                    <th class="col-md-3 sortable">Creation Date</th>
+                    <th class="col-md-1"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (var i = 0; i < Model.Count; i++)
                 {
                     <tr>
                         <td>@Html.DisplayFor(m => Model[i].DisplayName)</td>
                         <td>@Html.DisplayFor(m => Model[i].Author)</td>
                         <td>@Html.DisplayFor(m => Model[i].CreationDate)</td>
-                        @Html.HiddenFor(m => Model[i].Name)
-                        @Html.HiddenFor(m => Model[i].Author)
+                        @Html.HiddenFor(m => Model[i].Name, new { id = "fileName" + @i })
+                        @Html.HiddenFor(m => Model[i].Author, new { id = "author" + @i })
                         @Html.Hidden("Index", i)
-                        <td><input type="image" src="~/Content/img/glyphicons-182-download-alt.png" border="0" alt="Download" /></td>
+                        <td><input type="image" src="~/Content/img/glyphicons-182-download-alt.png" border="0" alt="Download" index="@i" /></td>
                     </tr>
                 }
-            }
-        </tbody>
-    </table>
-</div>
+            </tbody>
+        </table>
+    </div>
+}
+
+<script>
+    $(function () {
+        $('.sortable').each(function () {
+            var self = this;
+            $(self).click(function () {
+                var cn = $('#column-name-inp').val();
+                if (cn == $(self).text()) {
+                    if ($('#order-inp').val() == "asc") {
+                        $('#order-inp').val("desc");
+                    } else {
+                        $('#order-inp').val("asc");
+                    }
+                } else {
+                    $('#column-name-inp').val($(self).text());
+                    $('#order-inp').val("asc");
+                }
+
+                $('#view-docs-form').submit();
+            });
+        });
+
+        $('input[type=image]').each(function () {
+            var self = this;
+            $(self).click(function () {
+                var index = $(self).attr('index');
+                var fName = $('#fileName' + index).val();
+                var author = $('#author' + index).val();
+                window.location = "@Url.Action("DownloadDocument", "Document")" + "?fileName=" + fName + "&author=" + author;
+            });
+        });
+    });
+</script>

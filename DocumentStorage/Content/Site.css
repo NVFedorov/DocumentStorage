@@ -26,3 +26,8 @@ textarea {
 footer {
     text-align: center
 }
+
+.sortable:hover {
+    cursor: pointer;
+    background-color: #dddddd;
+}

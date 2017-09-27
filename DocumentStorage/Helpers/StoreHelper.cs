@@ -33,8 +33,8 @@ namespace DocumentStorage.Helpers
         /// </returns>
         public static string GetFileNameWithExtension(string file, string author)
         {
-            var files = Directory.GetFiles(StoreHelper.GetUserDirectory(author));
-            var found = files.FirstOrDefault(x => x.Contains(file));
+            var files = Directory.GetFiles(StoreHelper.GetUserDirectory(author)).Select(Path.GetFileName).ToList();
+            var found = files.FirstOrDefault(x => x.StartsWith(file));
 
             return Path.GetFileName(found);
         }

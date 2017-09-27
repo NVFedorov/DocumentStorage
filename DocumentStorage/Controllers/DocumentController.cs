@@ -27,6 +27,7 @@ namespace DocumentStorage.Controllers
 
         // GET: /Document/
         [Authorize]
+        [HttpGet]
         public ActionResult ViewDocuments()
         {
             var model =
@@ -42,6 +43,69 @@ namespace DocumentStorage.Controllers
                             }).ToList();
 
             return this.View("ViewDocuments", model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        public ActionResult ViewDocuments(string order, string columnName)
+        {
+            if (string.IsNullOrEmpty(order) || string.IsNullOrEmpty(columnName))
+            {
+                return this.ViewDocuments();
+            }
+
+            var model =
+                DocumentRepository.GetDocuments()
+                    .Select(
+                        x =>
+                        new DocumentViewModel
+                        {
+                            Name = x.Name,
+                            DisplayName = x.Name.Length > ConfigHelper.DocumentDisplayNameSize ? x.Name.Substring(0, ConfigHelper.DocumentDisplayNameSize) + "..." : x.Name,
+                            Author = x.Author.UserName,
+                            CreationDate = x.CreationDate
+                        });
+
+            columnName = columnName.ToLower().Replace(" ", string.Empty);
+
+            if (order == "desc")
+            {
+                switch (columnName)
+                {
+                    case "name":
+                        model = model.OrderByDescending(x => x.Name);
+                        break;
+                    case "author":
+                        model = model.OrderByDescending(x => x.Author);
+                        break;
+                    case "creationdate":
+                        model = model.OrderByDescending(x => x.CreationDate);
+                        break;
+                    default:
+                        model = model.OrderByDescending(x => x.Name);
+                        break;
+                }
+            }
+            else
+            {
+                switch (columnName)
+                {
+                    case "name":
+                        model = model.OrderBy(x => x.Name);
+                        break;
+                    case "author":
+                        model = model.OrderBy(x => x.Author);
+                        break;
+                    case "creationdate":
+                        model = model.OrderBy(x => x.CreationDate);
+                        break;
+                    default:
+                        model = model.OrderBy(x => x.Name);
+                        break;
+                }
+            }
+
+            return this.View("ViewDocuments", model.ToList());
         }
 
         [Authorize]
@@ -77,7 +141,7 @@ namespace DocumentStorage.Controllers
                         var extention = Path.GetFileName(Path.GetExtension(file.FileName));
                         var path = Path.Combine(
                             dirPath,
-                            string.Format("{0}.{1}", model.Name, string.IsNullOrEmpty(extention) ? ".txt" : extention));
+                            string.Format("{0}{1}", model.Name, string.IsNullOrEmpty(extention) ? ".txt" : extention));
 
                         try
                         {
@@ -124,20 +188,14 @@ namespace DocumentStorage.Controllers
             return this.UploadDocument();
         }
 
+        [HttpGet]
         [Authorize]
-        public FileResult DownloadDocument(IEnumerable<DocumentViewModel> m)
+        public FileResult DownloadDocument(string fileName, string author)
         {
-            if (m != null)
+            var doc = DocumentRepository.GetDocumentByAuthorAndName(fileName, author);
+            if (doc != null)
             {
-                var model = m.FirstOrDefault();
-                if (model != null)
-                {
-                    var doc = DocumentRepository.GetDocumentByAuthorAndName(model.Name, model.Author);
-                    if (doc != null)
-                    {
-                        return this.File(doc.FileContent, System.Net.Mime.MediaTypeNames.Application.Octet, StoreHelper.GetFileNameWithExtension(doc.Name, User.Identity.Name));
-                    }
-                }
+                return this.File(doc.FileContent, System.Net.Mime.MediaTypeNames.Application.Octet, StoreHelper.GetFileNameWithExtension(doc.Name, User.Identity.Name));
             }
 
             this.RedirectToAction("ViewDocuments");
