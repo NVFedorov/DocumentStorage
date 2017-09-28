@@ -206,9 +206,6 @@
     <Content Include="Views\Document\UploadDocument.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Document\DisplayTemplates\DocumentViewModel.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\Document\SearchPartial.cshtml" />
   </ItemGroup>
   <PropertyGroup>

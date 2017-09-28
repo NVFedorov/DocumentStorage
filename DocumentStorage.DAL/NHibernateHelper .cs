@@ -19,7 +19,7 @@ namespace DocumentStorage.DAL
     /// <summary>
     /// The NHibernate helper provides methods to initialize NHibernate.
     /// </summary>
-    public class NHibernateHelper
+    internal class NHibernateHelper
     {
         /// <summary>
         /// The open session.
